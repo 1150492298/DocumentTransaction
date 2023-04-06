@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.RoleRelationMapper">
+    <insert id="saveRoleRelation">
+        insert into rolerelation(rightId, roleId)
+        values (#{rightId},
+                #{roleId})
+    </insert>
+    <delete id="delRoleRelationById">
+        delete
+        from rolerelation
+        where roleId = #{ roleId }
+    </delete>
+    <select id="getRightByRoleId" resultType="com.example.springboot.entity.RoleRelation">
+        select *
+        from rolerelation
+        where roleId = #{ roleId }
+    </select>
+    <select id="getRightDetailByRoleId" resultType="com.example.springboot.entity.Rights">
+        SELECT *
+        FROM rolerelation ro
+                 , rights ri
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                ro.roleId = #{ roleId } and ro.rightId=ri.rightId
+            </trim>
+        </where>
+    </select>
+</mapper>

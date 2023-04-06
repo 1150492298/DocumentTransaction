@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.RoleSearchMapper">
+    <insert id="addRoleSearch">
+        insert into rolesearch(userId, roleId,searchReason)
+        values (#{userId},
+                #{roleId},
+                #{searchReason})
+    </insert>
+    <select id="pageRoleSearch" resultType="com.example.springboot.controller.dto.RoleSearchResultDTO">
+        select r.roleSearchId,r.roleId roleId,r.searchReason searchReason,r.searchTime searchTime,r.userId userId,u.userName userName
+        from user u,rolesearch r,role ro
+        <where>
+            <if test="userName !=null and userName != ''">
+                u.userName like concat('%',#{ userName },'%')
+            </if>
+            <if test="roleId !=null and roleId != ''">
+                and r.roleId =#{ roleId }
+            </if>
+            <if test="searchTime !=null and searchTime != ''">
+                and r.searchTime like concat('%',#{ searchTime },'%')
+            </if>
+            and r.roleId =ro.roleId
+            and ro.roleWeight &lt; #{ roleWeight }
+            and r.userId=u.userId
+            and r.searchStatue=1
+            order by r.searchTime desc
+        </where>
+    </select>
+    <select id="SelectRoleSearch" resultType="java.lang.Integer">
+        select roleSearchId from roleSearch
+        where userId=#{ userId } and searchStatue=1
+    </select>
+    <update id="roleChangeSuccess">
+        update rolesearch
+        set
+            manageId = #{ manageId },
+            manageTime = #{ manageTime },
+            searchStatue = 0
+        where roleSearchId = #{ roleSearchId }
+    </update>
+    <update id="roleSearchReject">
+        update rolesearch
+        set
+            manageId = #{ manageId },
+            manageTime = #{ manageTime },
+            searchStatue = 2
+        where roleSearchId = #{ roleSearchId }
+    </update>
+</mapper>

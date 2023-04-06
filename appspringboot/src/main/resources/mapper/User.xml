@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.UserMapper">
+    <insert id="SaveUser">
+        insert into user(roleId, userName, userPwd, userAccount, userSex, userPhone, departmentId, userIntro)
+        values (#{roleId},
+                #{userName},
+                #{userPwd},
+                #{userAccount},
+                #{userSex},
+                #{userPhone},
+                #{departmentId},
+                #{userIntro})
+    </insert>
+    <insert id="userRegister">
+        insert into user(userName, userPwd, userAccount, userSex, userPhone)
+        values (#{userName},
+                #{userPwd},
+                #{userAccount},
+                #{userSex},
+                #{userPhone})
+    </insert>
+    <select id="PageUsers" resultType="com.example.springboot.controller.dto.PageUserDTO">
+        select
+        u.userId userId,
+        u.roleId roleId,
+        u.userName userName,
+        u.userSex userSex,
+        u.userPhone userPhone,
+        u.departmentId departmentId,
+        u.updateTime updateTime,
+        d.departmentName departmentName,
+        r.roleName roleName
+        from user u,department d,role r
+        <where>
+            <if test="userName !=null and userName != ''">
+                u.userName like concat('%',#{ userName },'%')
+            </if>
+            <if test="updateTime !=null and updateTime != ''">
+                and u.updateTime like concat('%',#{ updateTime },'%')
+            </if>
+            <if test="userPhone !=null and userPhone != ''">
+                and u.userPhone like concat('%',#{ userPhone },'%')
+            </if>
+            <if test="roleId !=null and roleId != ''">
+                and u.roleId =#{ roleId }
+            </if>
+            <if test="departmentId !=null and departmentId != ''">
+                and u.departmentId =#{ departmentId }
+            </if>
+            and u.userStatue=1
+            and u.roleId=r.roleId
+            and u.departmentId=d.departmentId
+            and r.roleWeight &lt; 999
+            order by u.userId desc
+        </where>
+    </select>
+    <select id="getUsersById" resultType="com.example.springboot.entity.User">
+        select userId,
+               roleId,
+               userName,
+               userAccount,
+               userPwd,
+               userIntro,
+               userSex,
+               userPhone,
+               departmentId,
+               createTime
+        from user
+        where userId = #{ userId }
+    </select>
+    <select id="getUsersByUserPhone" resultType="java.lang.Integer">
+        select count(userId)
+        from user
+        where userPhone = #{ userPhone }
+    </select>
+    <select id="getUserAddressListById" resultType="java.lang.String">
+        select userAddressList
+        from user
+        where userId = #{ userId }
+    </select>
+    <select id="getUserPhoneById" resultType="com.example.springboot.entity.UserPhone">
+        select u.userId         userId,
+               u.roleId         roleId,
+               u.userName       userName,
+               u.userSex        userSex,
+               u.userPhone      userPhone,
+               u.updateTime     updateTime,
+               u.departmentId   departmentId,
+               d.departmentName departmentName,
+               r.roleName       roleName
+        from user u,
+             department d,
+             role r
+        where u.userId = #{ userId }
+          and u.userStatue = 1
+          and u.roleId = r.roleId
+          and u.departmentId = d.departmentId
+          and r.roleWeight &lt; 999
+        order by u.userId desc
+    </select>
+
+    <update id="updateUserAddressListById">
+        update user
+        set userAddressList = #{ userAddressList }
+        where userId = #{ userId }
+    </update>
+
+    <update id="updateUserById">
+        update user
+        set roleId       = #{ roleId },
+            userName     = #{ userName },
+            userIntro    = #{ userIntro },
+            userSex      = #{ userSex },
+            userPhone    = #{ userPhone },
+            departmentId = #{ departmentId },
+            updateTime   = #{ updateTime }
+        where userId = #{ userId }
+    </update>
+    <update id="updateUserRoleById">
+        update user
+        set roleId = #{ roleId }
+        where userId = #{ userId }
+    </update>
+    <update id="updateUserDepartmentById">
+        update user
+        set departmentId = #{ departmentId }
+        where userId = #{ userId }
+    </update>
+    <update id="userUpdateUserByToken">
+        update user
+        set userName  = #{ userName },
+            userIntro = #{ userIntro },
+            userSex   = #{ userSex }
+        where userId = #{ userId }
+    </update>
+    <delete id="delUserById">
+        delete
+        from user
+        where userId = #{ userId }
+    </delete>
+    <select id="UserLogin" resultType="com.example.springboot.entity.User">
+        select *
+        from user
+        where userAccount = #{ userAccount }
+          and userPwd = #{ userPwd }
+          and userStatue = 1
+    </select>
+    <select id="userCheck" resultType="java.lang.String">
+        select userAccount
+        from user
+        where userId = #{ userId }
+          and userPwd = #{ userPwd }
+          and userStatue = 1
+    </select>
+    <update id="userResetPwd">
+        update user
+        set userPwd = #{ userPwd }
+        where userId = #{ userId }
+    </update>
+
+</mapper>

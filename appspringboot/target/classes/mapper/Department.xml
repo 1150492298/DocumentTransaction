@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+            "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.DepartmentMapper">
+
+    <select id="CountDepartment" resultType="java.lang.Integer">
+        select count(*) from department
+    </select>
+
+    <select id="getDepartmentNameById" resultType="java.lang.String">
+        select departmentName
+        from department
+        where departmentId = #{ departmentId }
+    </select>
+
+    <select id="getDepartmentById" resultType="com.example.springboot.entity.Department">
+        select *
+        from department
+        where departmentId = #{ departmentId }
+    </select>
+
+    <update id="updateDepartmentById">
+        update department
+        set departmentIntro = #{ departmentIntro },
+            departmentName = #{ departmentName }
+        where departmentId = #{ departmentId }
+    </update>
+
+    <insert id="SaveDepartment">
+        insert into department(departmentIntro,departmentName,departmentStatue)
+        values(#{departmentIntro},#{departmentName},1)
+    </insert>
+
+    <select id="pageDepartment" resultType="com.example.springboot.entity.Department">
+        select *
+        from department
+        <where>
+            <if test="departmentName !=null and departmentName != ''">
+                and departmentName like concat('%',#{ departmentName },'%')
+            </if>
+        </where>
+    </select>
+</mapper>

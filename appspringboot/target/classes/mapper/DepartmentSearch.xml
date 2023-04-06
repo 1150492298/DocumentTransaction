@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.DepartmentSearchMapper">
+    <insert id="addDepartmentSearch">
+        insert into departmentsearch(userId, departmentId,searchReason)
+        values (#{userId},
+        #{departmentId},
+        #{searchReason})
+    </insert>
+    <select id="pageDepartmentSearch" resultType="com.example.springboot.controller.dto.DepartmentSearchResultDTO">
+        select r.departmentSearchId,r.departmentId departmentId,r.searchReason searchReason,r.searchTime searchTime,r.userId userId,u.userName userName,d.departmentName
+        from user u,departmentsearch r,department d
+        <where>
+            <if test="userName !=null and userName != ''">
+                u.userName like concat('%',#{ userName },'%')
+            </if>
+            <if test="departmentId !=null and departmentId != ''">
+                and r.departmentId =#{ departmentId }
+            </if>
+            <if test="searchTime !=null and searchTime != ''">
+                and r.searchTime like concat('%',#{ searchTime },'%')
+            </if>
+            and r.departmentId=d.departmentId
+            and r.userId=u.userId
+            and r.searchStatue=1
+            order by r.searchTime desc
+        </where>
+    </select>
+    <update id="departmentChangeSuccess">
+        update departmentsearch
+        set
+        manageId = #{ manageId },
+        manageTime = #{ manageTime },
+        searchStatue = 0
+        where departmentSearchId = #{ departmentSearchId }
+    </update>
+    <select id="SelectDepartmentSearch" resultType="java.lang.Integer">
+        select departmentSearchId from departmentsearch
+        where userId=#{ userId } and searchStatue=1
+    </select>
+    <update id="departmentSearchReject">
+        update departmentsearch
+        set
+            manageId = #{ manageId },
+            manageTime = #{ manageTime },
+            searchStatue = 2
+        where departmentSearchId = #{ departmentSearchId }
+    </update>
+</mapper>

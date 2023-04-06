@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.RoleMapper">
+    <insert id="saveRole" keyProperty="roleId" useGeneratedKeys="true">
+        insert into role(roleName, roleDescribe, roleWeight)
+        values (#{roleName},
+                #{roleDescribe},
+                #{roleWeight})
+    </insert>
+    <select id="PageRoles" resultType="com.example.springboot.entity.Role">
+        select * from role where roleWeight &lt; 999 order by roleWeight desc
+    </select>
+    <select id="getRolesById" resultType="com.example.springboot.entity.Role">
+        select *
+        from role
+        where roleId = #{ roleId }
+    </select>
+    <select id="getRoleNameById" resultType="java.lang.String">
+        select roleName
+        from role
+        where roleId = #{ roleId }
+    </select>
+    <select id="getRoleWeightByUserId" resultType="java.lang.Integer">
+        select r.roleWeight
+        from role r,user u
+        where u.userId = #{ userId } and u.roleId=r.roleId
+    </select>
+    <select id="listRoles" resultType="com.example.springboot.entity.Role">
+        select * from role where roleWeight &lt; 999 order by roleWeight desc
+    </select>
+    <update id="updateRoleById">
+        update role
+        set roleName = #{ roleName },
+            roleDescribe = #{ roleDescribe },
+            roleWeight = #{ roleWeight }
+        where roleId = #{ roleId }
+    </update>
+    <delete id="delRoleById">
+        delete from role where roleId = #{ roleId }
+    </delete>
+</mapper>

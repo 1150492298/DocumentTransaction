@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.springboot.mapper.DocumentMapper">
+    <select id="PageDocuments" resultType="com.example.springboot.controller.dto.DocumentExamineDTO">
+        select d.documentId documentId,
+        d.documentClassId documentClassId,
+        d.userId userId,
+        d.documentName documentName,
+        d.documentPostTime documentPostTime,
+        d.documentStatue documentStatue,
+        dc.documentClassName documentClassName,
+        u.userName userName
+        from document d,documentclass dc,user u
+        <where>
+            <if test="documentName !=null and documentName != ''">
+                d.documentName like concat('%',#{ documentName },'%')
+            </if>
+            <if test="documentPostTime !=null and documentPostTime != ''">
+                and d.documentPostTime like concat('%',#{ documentPostTime },'%')
+            </if>
+            <if test="userName !=null and userName != ''">
+                u.userName like concat('%',#{ userName },'%')
+            </if>
+            <if test="documentStatue !=null and documentStatue != ''">
+                and d.documentStatue =#{ documentStatue }
+            </if>
+            <if test="documentClassId !=null and documentClassId != ''">
+                and d.documentClassId =#{ documentClassId }
+            </if>
+            and d.userId=u.userId
+            and dc.documentClassId=d.documentClassId
+        </where>
+    </select>
+    <delete id="delDocumentById">
+        delete
+        from document
+        where documentId = #{ documentId }
+    </delete>
+    <insert id="PostDocument">
+        insert into document(userId,
+                             documentName,
+                             documentAbout,
+                             documentClassId,
+                             documentNowExamerId,
+                             documentNowDepartmentId,
+                             documentContent,
+                             documentContentName)
+        values (#{userId},
+                #{documentName},
+                #{documentAbout},
+                #{documentClassId},
+                #{documentNowExamerId},
+                #{documentNowDepartmentId},
+                #{documentContent},
+                #{documentContentName})
+    </insert>
+    <select id="getDocumentExamine" resultType="com.example.springboot.controller.dto.DocumentExamineDTO">
+        select d.documentId documentId,
+        d.documentClassId documentClassId,
+        d.userId userId,
+        d.documentName documentName,
+        d.documentPostTime documentPostTime,
+        dc.documentClassName documentClassName,
+        u.userName userName
+        from document d,documentclass dc,user u
+        <where>
+            <if test="documentName !=null and documentName != ''">
+                d.documentName like concat('%',#{ documentName },'%')
+            </if>
+            <if test="documentPostTime !=null and documentPostTime != ''">
+                and d.documentPostTime like concat('%',#{ documentPostTime },'%')
+            </if>
+            and d.documentNowExamerId = #{ documentNowExamerId }
+            and d.documentNowDepartmentId=#{ documentNowDepartmentId }
+            and d.documentStatue=1
+            and d.userId=u.userId
+            and dc.documentClassId=d.documentClassId
+        </where>
+    </select>
+    <select id="getDocumentById" resultType="com.example.springboot.entity.Document">
+        select *
+        from document
+        where documentId = #{ documentId }
+    </select>
+    <select id="getDocumentByUserToken" resultType="com.example.springboot.controller.dto.DocumentMyselfDTO">
+        select d.documentId documentId,
+        d.documentStatue documentStatue,
+        d.documentClassId documentClassId,
+        d.documentName documentName,
+        d.documentPostTime documentPostTime,
+        dc.documentClassName documentClassName
+        from document d,
+        documentclass dc
+        <where>
+            <if test="documentName !=null and documentName != ''">
+                d.documentName like concat('%',#{ documentName },'%')
+            </if>
+            <if test="documentPostTime !=null and documentPostTime != ''">
+                and d.documentPostTime like concat('%',#{ documentPostTime },'%')
+            </if>
+            <if test="documentClassId !=null and documentClassId != ''">
+                and d.documentClassId = #{ documentClassId }
+            </if>
+            <if test="documentStatue !=null and documentStatue != ''">
+                and d.documentStatue = #{documentStatue }
+            </if>
+            and d.userId = #{ userId }
+            and dc.documentClassId = d.documentClassId
+        </where>
+
+    </select>
+    <update id="approveDocumentById">
+        update document
+        set documentExamerString    = #{ documentExamerString },
+            documentProcess         = #{ documentProcess },
+            documentExameTimeString = #{ documentExameTimeString },
+            documentNowExamerId     = #{ documentNowExamerId },
+            documentNowDepartmentId = #{ documentNowDepartmentId },
+            documentStatue= #{ documentStatue }
+        where documentId = #{ documentId }
+    </update>
+</mapper>
